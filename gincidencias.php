@@ -124,7 +124,6 @@
 		echo "<td><button type='button' onClick=\"location.href='gincidencias.php'\">Ocultar</button>";
 	}
 	//imprimimos la tabla con todas las incidencias
-	$result=mysql_query("SELECT * FROM $dbname.incidencia ORDER BY id ASC") or die(mysql_error());
 	//impresión de la primera fila
 	echo "<table border='1' cellspacing='0'>";
 	echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
@@ -149,8 +148,8 @@
             </td> <td>
                <b><center>Borrar</center></b>
             </td> </tr>";	
-	
 
+	$result=mysql_query("SELECT * FROM $dbname.incidencia ORDER BY id ASC") or die(mysql_error());
    while ($row=mysql_fetch_array($result)){
 		$id=$row['id'];
 		$fecha=$row['fecha'];
