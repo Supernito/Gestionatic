@@ -24,6 +24,14 @@
          return confirm("Esta entrada será eliminada. ¿Está de acuerdo?");
       }
 
+      function asegurar2(id) {
+         if (confirm("Este problema será eliminado. ¿Está de acuerdo?")){
+            location.href='gproblemas.php?elim='+id;
+            return true;
+         }
+         return false;
+      }
+
    </script>
 
 <?php
@@ -31,6 +39,23 @@
    mysql_connect(dbhost,dbuser,dbpass);
    mysql_select_db(dbname);
    session_start();
+
+   // Función para poner mejor la fecha/hora
+   function dateadd($operacion, $date, $dd=0, $mm=0, $yy=0, $hh=0, $mn=0, $ss=0){
+      if($operacion=="resta"){
+         $date_r = getdate(strtotime($date));
+         $resultado = date("d-m-Y H:i:s", mktime(($date_r["hours"]-$hh),
+                           ($date_r["minutes"]-$mn),($date_r["seconds"]-$ss),
+                           ($date_r["mon"]-$mm),($date_r["mday"]-$dd),($date_r["year"]-$yy)));
+         return $resultado; }
+      else {
+         $date_r = getdate(strtotime($date));
+         $resultado = date("d-m-Y H:i:s", mktime(($date_r["hours"]+$hh),
+                           ($date_r["minutes"]+$mn), ($date_r["seconds"]+$ss),
+                           ($date_r["mon"]+$mm),($date_r["mday"]+$dd),($date_r["year"]+$yy)));
+         return $resultado;
+      }
+   }
 
    // Controlar aquí también que tenga permisos
    if ($_SESSION['logged']!=true){
@@ -40,6 +65,18 @@
       pie(); die();
    }
 
+   // Miraramos los permisos para gestionar problemas. Los guardamos en $own
+   $query = "SELECT is_admin,g_prob FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+   $res   = mysql_query($query) or die(mysql_error());
+   $own   = mysql_fetch_array($res);
+
+   // Si no tiene permisos morimos
+   if ($own[is_admin] == 'false' && $own[g_prob] == 'false'){
+      echo "No tienes permisos suficientes.";
+      mysql_close;
+      pie();die();
+   }
+
    // Nuevo problema
    echo "<form action='nuevoproblema.php' method='POST'>";
    echo "   <input type='hidden' name='origen'  value='gproblemas.php'>";
@@ -47,7 +84,7 @@
    echo "</form>";
 
    // Eliminamos el problema seleccionado
-   if($_GET[elim]){
+   if($_GET[elim] && is_numeric($_GET[elim])){
       // No se elimina, se pone en el estado eliminado
       $query = "INSERT INTO ".dbname.".estado_prob
                    (nombre, descripcion, username, fecha, problema)
@@ -57,7 +94,7 @@
    }
 
    // Detalles del problema seleccionado
-   if($_GET[ver]){
+   if($_GET[ver] && is_numeric($_GET[ver])){
       // A diferéncia de l'altre aquí sortirien tots els estats que ha tingut
       $query = "SELECT prob.nombre nombre, prob.descripcion descripcion,
                    u.nombre urgencia, i.nombre impacto, p.nombre prioridad,
@@ -68,15 +105,13 @@
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
                LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
-               WHERE ep.fecha=(SELECT max(fecha) FROM ".dbname.".estado_prob
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
                   prob.id = $_GET[ver]";
       $res = mysql_query($query) or die(mysql_error());
       $row = mysql_fetch_array($res);
       echo "<H4>Detalles del problema \"$row[nombre]\":</H4>";
-      if ($row[estado] != 'eliminado'){
-         echo "<button type='button' onClick=\"location.href='editproblema.php?id=$_GET[ver]'\">Editar Problema</button>";
-      }
+      $estado = $row[estado];
       echo "<table border='0' cellspacing='0' summary='Detalles del problema'>";
       echo "<tr><td> <b>ID:</b>            </td><td> $_GET[ver]        </td></tr>";
       echo "<tr><td> <b>Nombre:</b>        </td><td> $row[nombre]      </td></tr>";
@@ -87,15 +122,19 @@
       echo "<tr><td> <b>Incidencia:</b>    </td><td> $row[incidencia]  </td></tr>";
       echo "<tr><td> <b>Estado actual:</b> </td><td> $row[estado]      </td></tr>";
       echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
-      $query = "SELECT descripcion, username, CONVERT_TZ(fecha, '+00:00', '$zona_horaria') as fecha
+      $query = "SELECT descripcion, username, fecha
                 FROM ".dbname.".estado_prob
                 WHERE problema=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> $row[fecha] </td><td> <i>$row[username]</i> --> $row[descripcion] </td></tr>";
+         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> <i>$row[username]</i> --> $row[descripcion] </td></tr>";
       }
       echo "</table>";
-      echo "<button type='button' onClick=\"location.href='gproblemas.php'\">Ocultar</button>";
+      if ($estado != 'eliminado'){
+         echo "<button type='button' onClick=\"location.href='editproblema.php?id=$_GET[ver]'\">Editar Problema</button>";
+         echo "<button type='button' onClick='return asegurar2($_GET[ver]);'>Borrar</button>";
+      }
+      echo "<BR><button type='button' onClick=\"location.href='gproblemas.php'\">Ocultar</button>";
    }
 
    // Problemas
@@ -137,7 +176,7 @@
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
                LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
-               WHERE ep.fecha=(SELECT max(fecha) FROM ".dbname.".estado_prob
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
                   ep.nombre = 'eliminado'";
    } else {
@@ -150,7 +189,7 @@
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
                LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
-               WHERE ep.fecha=(SELECT max(fecha) FROM ".dbname.".estado_prob
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
                   ep.nombre != 'eliminado'";
    }

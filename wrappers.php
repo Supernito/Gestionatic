@@ -1,7 +1,7 @@
 <?php
 function cabecera($titulo){
-echo "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
-<html lang='es' class='resizable'>
+   echo "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html lang='es'>
    <head>
       <title>GESTIONATIC - $titulo -</title>
       <meta http-equiv='Content-Type' content='text/html; charset= iso-8859-1'>
@@ -36,18 +36,25 @@ echo "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www
       //si está logeado le saludamos :)
       echo "hola, ",$_SESSION['username'], "    <a href='logout.php' class='resizable'>salir</a>";
    }
-   echo "</div> <div id='contenido'>";
+   echo "</div></div> <div id='contenido'>";
 }    
 
 function pie(){
-         echo "<BR><div id='pie'><BR>";
-         echo " &nbsp; <a href='./'>Página Principal</a>";
-         echo " &nbsp; <a target='_blank' href='/download/SITGESTIONATICManualdeusuario.pdf'>Manual de usuario</a>";
-         echo " &nbsp; <a target='_blank' href='/download/SITGESTIONATICManualdeinstalacion.pdf'>Manual de instalación</a>";
-         echo " &nbsp; <a href='./'>Descargar código fuente</a>";
-         echo "
-         </div>
-      </div>
+   echo "<BR><div id='pie'><center><BR>";
+   echo "<button type='button' onClick=\"location.href='./'\">
+            Página Principal
+         </button> ";
+   echo "<button type='button' onClick=\"location.href='/download/SITGESTIONATICManualdeusuario.pdf'\">
+            Manual de usuario
+         </button> ";
+   echo "<button type='button' onClick=\"location.href='/download/SITGESTIONATICManualdeinstalacion.pdf'\">
+            Manual de instalación
+         </button> ";
+   echo "<button type='button' onClick=\"location.href='https://github.com/Supernito/Gestionatic'\">
+            Descargar código fuente
+         </button> ";
+   echo "</center> </div> <!--PIE-->
+      </div> <!--CONTENIDO-->
    </body>
 </html>";
 

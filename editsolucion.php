@@ -9,6 +9,19 @@
  
 if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
 
+
+   // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
+   $query = "SELECT is_admin,g_inc FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+   $res   = mysql_query($query) or die(mysql_error());
+   $own   = mysql_fetch_array($res);
+
+   // Si no tiene permisos morimos
+   if ($own[is_admin] == 'false' && $own[g_inc] == 'false'){
+      echo "No tienes permisos suficientes.";
+      mysql_close;
+      pie();die();
+   }
+
 	$id= $_GET['id'];
 
 	$query = mysql_query("SELECT * FROM $dbname.solucion WHERE id='$id'");

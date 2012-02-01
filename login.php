@@ -1,5 +1,4 @@
 <?php
-   //TODO control de errores
    include 'db.conf';
    include 'wrappers.php';
 
@@ -10,21 +9,17 @@
    $password = $_POST['password'];
 
    mysql_connect(dbhost,dbuser,dbpass); 
-   mysql_select_db(dbname); 
-   $q='false';
-   $q = mysql_query("SELECT password FROM $dbname.usuario WHERE username='$login'");
-   $db_pass = mysql_fetch_array($q);
+   mysql_select_db(dbname);
+   $query = "SELECT * FROM ".dbname.".usuario WHERE username='$login'";
+   $res = mysql_query($query) or die(mysql_error());
+   $row = mysql_fetch_array($res);
 
-   if(md5($password) == $db_pass['password']){
-      $_SESSION['username']=$login;
+   if(md5($password) == $row['password']){
+      $_SESSION['username']=$row[username];
       $_SESSION['logged']='true';
-      echo "Correcto, est&aacutes logeado";
-
-// Posar aquí ses posibles accions a fer (Anar a sa seva pagina personal o ficar peça
-// (també tornar a s'inici però això ha de sortir tant si se loguea com si no))
-
+      echo "Correcto, est�s logeado.";
    }else{
-      echo "Usuario o contrase&ntildea incorrectos<br>";
+      echo "<h4>Usuario o contrase�a incorrectos</h4>";
    }
    echo "<BR><a href='./'>Volver al inicio</a>";
 

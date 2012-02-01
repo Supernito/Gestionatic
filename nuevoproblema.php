@@ -15,6 +15,18 @@
       pie(); die();
    }
 
+   // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
+   $query = "SELECT is_admin,g_inc,g_prob FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+   $res   = mysql_query($query) or die(mysql_error());
+   $own   = mysql_fetch_array($res);
+
+   // Si no tiene permisos morimos
+   if ($own[is_admin] == 'false' && $own[g_inc] == 'false' && $own[g_prob]){
+      echo "No tienes permisos suficientes.";
+      mysql_close;
+      pie();die();
+   }
+
    // Script de comprovación
 ?>
 
@@ -41,9 +53,13 @@
       $impacto     = $_POST['impacto'];
       $prioridad   = $_POST['prioridad'];
 
-      // Comprovación que el nombre no esté ya en la BBDD
+      // Comprovación que el nombre no esté ya en la BBDD (y si está que esté borrado)
 
-      $query = "SELECT count(*) num from ".dbname.".problema WHERE nombre='$nombre'";
+      $query = "SELECT count(*) num FROM ".dbname.".problema prob
+                  LEFT JOIN ".dbname.".estado_prob ep on (ep.problema = prob.id)
+                  WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
+                               WHERE problema = prob.id group by problema) AND
+                  ep.nombre != 'eliminado' AND prob.nombre='$nombre'";
       $res   = mysql_query($query) or die(mysql_error());
       $row   = mysql_fetch_array($res);
       $num   = $row['num'];
@@ -67,7 +83,7 @@
          $res = mysql_query($query) or die(mysql_error());
          echo "Problema insertado con éxito.<BR>";
       } else {
-         echo "Ya existe un problema con este nombre.<BR>";
+         echo "Ya existe un problema activo con este nombre.<BR>";
       }
 
       if (isset($_POST['origen'])){

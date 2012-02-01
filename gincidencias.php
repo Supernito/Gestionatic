@@ -45,6 +45,19 @@
       // No hay nadie logueado
       echo "<p>Hay que estar logueado para poder acceder a las funcionalidades</p>";
   } else {
+
+      // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
+      $query = "SELECT is_admin,g_inc FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+      $res   = mysql_query($query) or die(mysql_error());
+      $own   = mysql_fetch_array($res);
+
+      // Si no tiene permisos morimos
+      if ($own[is_admin] == 'false' && $own[g_inc] == 'false'){
+         echo "No tienes permisos suficientes.";
+         mysql_close;
+         pie();die();
+      }
+
       // Hay un usuario logueado
 	$loggedu = $_SESSION['username'];
       echo "<p>Bienvenido ".$loggedu.", Quiz&aacute quieras ver los <a href='diagnosticos.php'>diagn&oacutesticos</a> o las <a href='soluciones.php'>soluciones</a></p><HR>";
@@ -57,6 +70,7 @@
       echo "<form action='nuevaincidencia.php' method='POST'> 
 	  <input type='submit' class='button' name='nuevaincidencia' value='Introducir nueva incidencia'/>
 	  </form>";
+      echo "<H4>Incidencias Existentes:</H4>";
 		$id=$_GET['ver'];
 		if($_GET['ver']){
       	$result=mysql_query("SELECT * FROM $dbname.incidencia WHERE id=$id") or die(mysql_error());
@@ -99,7 +113,7 @@
 	  
 	  //opciones de edición, solo para administradores
       
-		if ($isadmin=='true'){
+		if ($isadmin=='true' || $own[g_inc]=='true'){
 			$id=$row['id'];
 			echo "<table border='0' cellspacing='0'> <tr>";
 		
@@ -126,7 +140,6 @@
 	//imprimimos la tabla con todas las incidencias
 	//impresión de la primera fila
 	echo "<table border='1' cellspacing='0'>";
-	echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
 	echo "<tr> <td>
                <b><center>Id</center></b>
             </td> <td>
@@ -156,7 +169,7 @@
 		$fecha=dateadd($suma,$fecha,0,0,0,6,0,0);
 		$fecha=date($fecha);
 		//aquÃ­ se imprimen las incidencias
-		echo "<tr>";
+		echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
 		echo "<td> ".$id."</td>";
 		echo "<td> ".$row['nombre']."</td>";
 		$descrip = $row['descripcion'];

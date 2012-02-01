@@ -33,7 +33,19 @@
       // No hay nadie logueado
       echo "<p>Hay que estar logueado para poder acceder a las funcionalidades</p>";
    } else {
-		echo "<p>Bienvenido ".$loggedu.", Quiz&aacute quieras ver las <a href='gincidencias.php'>incidencias</a> o las <a href='soluciones.php'>soluciones</a></p><HR>";
+
+      // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
+      $query = "SELECT is_admin,g_inc FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+      $res   = mysql_query($query) or die(mysql_error());
+      $own   = mysql_fetch_array($res);
+
+      // Si no tiene permisos morimos
+      if ($own[is_admin] == 'false' && $own[g_inc] == 'false'){
+         echo "No tienes permisos suficientes.";
+         mysql_close;
+         pie();die();
+      }
+		echo "<p>Bienvenido $_SESSION[username], Quiz&aacute quieras ver las <a href='gincidencias.php'>incidencias</a> o las <a href='soluciones.php'>soluciones</a></p><HR>";
       // Hay un usuario logueado
 	   $loggedu = $_SESSION['username'];
       $query = "SELECT id,is_admin FROM $dbname.usuario WHERE username='$loggedu'";
@@ -45,6 +57,7 @@
 		echo "<form action='nuevodiagnostico.php' method='POST'> 
          <input type='submit' class='button' name='nuevodiagnostico' value='Introducir nuevo diagnostico'/>
          </form>";
+      echo "<H4>Diagnosticos Existentes:</H4>";
 		//aquí se imprime la descripción del diagnóstico si se le ha dado a ver
 		$id=$_GET['ver'];
 		if($_GET['ver']){
@@ -72,7 +85,6 @@
 		}
 		//aquí se imprime la tabla con todos los diagnósticos
 		echo "<table border='1' cellspacing='0'>";
-		echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
 		echo "<tr> <td>
             <b><center>Id</center></b>
           </td> <td>
@@ -87,7 +99,7 @@
 		$result=mysql_query("SELECT * FROM $dbname.diagnostico ORDER BY id ASC") or die(mysql_error());
 		while ($row=mysql_fetch_array($result)){
 			$id=$row['id'];
-			echo "<tr>";
+			echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
 			echo "<td> ".$id."</td>";
 			echo "<td> ".$row['nombre']."</td>";
 			$descrip = $row['descripcion'];
