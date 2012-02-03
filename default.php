@@ -37,10 +37,10 @@
       if ($row[is_admin] == 'true' || $row[g_ver] == 'true'){
          echo "<a href='./'>Gestión de Versiones</a>(pendiente)<BR>"; $opciones++;
       }
-//      echo "<HR><p>Las siguientes son optativas</p>";
       if ($row[is_admin] == 'true' || $row[g_usuarios] == 'true'){
-         echo "<a href='./gusuarios.php'>Gestión de de usuarios</a><BR>"; $opciones++;
+         echo "<a href='./gusuarios.php'>Gestión de Usuarios</a><BR>"; $opciones++;
       }
+/*
       if ($row[is_admin] == 'true'){
          echo "<a href='./'>Gestión de de niveles de servicio</a>(pendiente)<BR>"; $opciones++;
       }
@@ -59,6 +59,7 @@
       if ($row[is_admin] == 'true'){
          echo "<a href='./'>Gestión de la seguridad</a>(pendiente)<BR>"; $opciones++;
       }
+*/
       if ($opciones == 0){
          echo "<p>No tienes ninguna opción disponible, contacta con un administrador.</p>";
       }
