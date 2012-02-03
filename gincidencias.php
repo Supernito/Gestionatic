@@ -91,6 +91,7 @@
 			echo "<tr><td><b>Aplicaci&oacuten:</b></td><td> ".$row['aplicacion']."</td></tr>";
 			echo "<tr><td><b>Diagn&oacutestico:</b></td><td> ".$row['diagnostico']."</td></tr>";
 			$diagnostico=$row['diagnostico'];
+			$problema=$row['problema'];
 			//imprimimos la solución al diagnóstico si lo hay
 			$resultdiag=mysql_query("SELECT * FROM $dbname.diagnostico WHERE nombre='$diagnostico'") or die(mysql_error());
 			if (mysql_numrows($resultdiag)!=0){//no se ha encontrado diagnóstico con ese nombre
@@ -105,9 +106,16 @@
 					echo "<tr><td><b>Soluciones:</b></td><td>";
 					while ($rowsol=mysql_fetch_array($resultsol)){
 						echo "<tr><td><b>Nombre:</b></td><td> ".$rowsol['nombre']."</td></tr>";
-						echo "<tr><td><b>Descripci&oacuten: </b></td><td> ".$rowso['descripcion']."</td></tr>";
+						echo "<tr><td><b>Descripci&oacuten: </b></td><td> ".$rowsol['descripcion']."</td></tr>";
 					}   	
 				}
+			}
+			//imprimimos el problema asociado si lo hay
+			if ($problema){
+				$resultprob=mysql_query("SELECT nombre FROM $dbname.problema WHERE id='$problema'") or die(mysql_error());
+				$resultprob=mysql_fetch_array($resultprob);
+				$nombreprob=$resultprob['nombre'];
+				echo "<tr><td><b>Problema asociado:</b></td><td> <a href='./gproblemas.php?ver=$problema'>$nombreprob</a> </td></tr>";
 			}
 			echo "</table>";
 	  
@@ -127,13 +135,20 @@
 					<input type='hidden' name='idincidencia' value='$id'>
 					<input type='submit' class='button' name='elimincidencia' value='Eliminar incidencia'/>
 					</form></td>";
-
-			echo "<td><form method='post' action='nuevoproblema.php'>
-					<input type='hidden' name='origen'  value='gincidencias.php'>
-					<input type='hidden' name='incidencia'  value='$id'>
-					<input type='submit' class='button' name='nuevoproblema' value='Elevar a problema'/>
-					</form></td>";
-			echo "</tr> </table>";      	
+			if (!$problema){//sólo si no hay problema asociado se puede elevar a problema
+				echo "<td><form method='post' action='nuevoproblema.php'>
+						<input type='hidden' name='origen'  value='gincidencias.php'>
+						<input type='hidden' name='incidencia'  value='$id'>
+						<input type='submit' class='button' name='nuevoproblema' value='Elevar a problema'/>
+						</form></td>";
+			}else{
+				echo "<td><form method='post' action='desvincprob.php'>
+						<input type='hidden' name='origen'  value='gincidencias.php'>
+						<input type='hidden' name='incidencia'  value='$id'>
+						<input type='submit' class='button' name='desvincular' value='Desvincular del problema'/>
+						</form></td>";
+			}
+			echo "</tr> </table>";	
    	}
 		echo "<td><button type='button' onClick=\"location.href='gincidencias.php'\">Ocultar</button>";
 	}

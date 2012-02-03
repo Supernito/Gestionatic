@@ -11,8 +11,7 @@
    // Si no está logueado o no tiene permiso terminamos
    if ($_SESSION['logged']!=true){
       echo "No tienes permisos para ver esto.<BR>";
-      mysql_close();
-      pie(); die();
+      mysql_close();pie();die();
    }
 
    // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
@@ -22,9 +21,29 @@
 
    // Si no tiene permisos morimos
    if ($own[is_admin] == 'false' && $own[g_inc] == 'false' && $own[g_prob]){
-      echo "No tienes permisos suficientes.";
-      mysql_close;
-      pie();die();
+      echo "No tienes permisos suficientes.<BR>";
+      mysql_close;pie();die();
+   }
+
+   // Miramos si hay incidencias sin estar elevadas a problemas
+   $query = "SELECT count(*) num FROM ".dbname.".incidencia WHERE problema IS NULL";
+   $res   = mysql_query($query) or die(mysql_error());
+   $row   = mysql_fetch_array($res);
+
+   // Si no hay incidencias para crear problemas, morimos con el correspondiente mensaje de error.
+   if ($row[num] == 0){
+      echo "No hay incidencias para asignar a problemas. Asegurese de que exista almenos una.<BR>";
+      if ($own[g_prob] == 'true' || $own[is_admin] == 'true'){
+         echo "<button type='button' onClick=\"location.href='gproblemas.php'  \">
+                  Ir a Gestión de problemas
+               </button>";
+      }
+      if ($own[g_inc] == 'true' || $own[is_admin] == 'true'){
+         echo "<button type='button' onClick=\"location.href='gincidencias.php'\">
+                  Ir a Gestión de incidencias
+               </button>";
+      }
+      echo "<BR>";mysql_close;pie();die();
    }
 
    // Script de comprovación
@@ -54,7 +73,6 @@
       $prioridad   = $_POST['prioridad'];
 
       // Comprovación que el nombre no esté ya en la BBDD (y si está que esté borrado)
-
       $query = "SELECT count(*) num FROM ".dbname.".problema prob
                   LEFT JOIN ".dbname.".estado_prob ep on (ep.problema = prob.id)
                   WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
@@ -64,27 +82,51 @@
       $row   = mysql_fetch_array($res);
       $num   = $row['num'];
 
-      if ($num=='0'){
-         if (!isset($_POST['incidencia'])){
-            $query = "INSERT INTO  ".dbname.".problema
-                         (nombre, descripcion, urgencia, impacto, prioridad)
-                      VALUES ('$nombre', '$descripcion', '$urgencia', '$impacto', '$prioridad')";
-         } else {
-            $incidencia = $_POST['incidencia'];
-            $query = "INSERT INTO  ".dbname.".problema
-                         (nombre, descripcion, urgencia, impacto, prioridad, incidencia)
-                      VALUES ('$nombre', '$descripcion', '$urgencia', '$impacto', '$prioridad', '$incidencia')";
-         }
-         $res = mysql_query($query) or die(mysql_error());
-         $id = mysql_insert_id ();
-         $query = "INSERT INTO ".dbname.".estado_prob
-                      (nombre, descripcion, username, fecha, problema)
-                   VALUES ('creado','Se ha creado el problema', '$_SESSION[username]', NOW(), $id)";
-         $res = mysql_query($query) or die(mysql_error());
-         echo "Problema insertado con éxito.<BR>";
-      } else {
+      if ($num!='0'){
          echo "Ya existe un problema activo con este nombre.<BR>";
+         if (isset($_POST['origen'])){
+            echo "<button type='button' onClick=\"location.href='".$_POST['origen']."'\">Volver</button>";
+         } else {
+            echo "<button type='button' onClick=\"location.href='gproblemas.php'  \">Ir a Gestión de problemas  </button>";
+            echo "<button type='button' onClick=\"location.href='gincidencias.php'\">Ir a Gestión de incidencias</button>";
+         }
+         echo "<BR>";mysql_close();pie();die();
       }
+
+      // Comprobación de que hay almenos una incidencia seleccionada
+      $incidencias = $_POST[incidencias];
+      if (count($incidencias)==0){
+         echo "No se ha seleccionado ninguna incidencia. Debería haber almenos una.<BR>";
+         if ($own[g_prob] == 'true' || $own[is_admin] == 'true'){
+            echo "<button type='button' onClick=\"location.href='gproblemas.php'  \">
+                     Ir a Gestión de problemas
+                  </button>";
+         }
+         if ($own[g_inc] == 'true' || $own[is_admin] == 'true'){
+            echo "<button type='button' onClick=\"location.href='gincidencias.php'\">
+                     Ir a Gestión de incidencias
+                  </button>";
+         }
+         echo "<BR>";mysql_close;pie();die();
+      }
+
+      $query = "INSERT INTO  ".dbname.".problema
+                   (nombre, descripcion, urgencia, impacto, prioridad)
+                VALUES ('$nombre', '$descripcion', '$urgencia', '$impacto', '$prioridad')";
+      $res = mysql_query($query) or die(mysql_error());
+      $id = mysql_insert_id ();
+      $query = "INSERT INTO ".dbname.".estado_prob
+                   (nombre, descripcion, username, fecha, problema)
+                VALUES ('creado','Se ha creado el problema', '$_SESSION[username]', NOW(), $id)";
+      $res = mysql_query($query) or die(mysql_error());
+
+      // Actualizamos las incidencias para que esten relacionadas con este problema
+      for ($i=0;$i<count($incidencias);$i++){
+         $query = "UPDATE ".dbname.".incidencia SET problema = '$id' WHERE id='$incidencias[$i]'";
+         $res = mysql_query($query) or die(mysql_error());
+      }
+
+      echo "Problema insertado con éxito.<BR>";
 
       if (isset($_POST['origen'])){
          echo "<button type='button' onClick=\"location.href='".$_POST['origen']."'\">Volver</button>";
@@ -130,8 +172,21 @@
       while ($row=mysql_fetch_array($res)){
          echo "      <option value='".$row['id']."'>".$row['nombre']."</option>";
       }
+      echo "   </select> </td></tr>";
+      echo "   <tr><td>Incidencia(**) </td><td> <select name='incidencias[]' multiple>";
+      $query = "SELECT id,nombre FROM ".dbname.".incidencia WHERE problema IS NULL";
+      $res   = mysql_query($query) or die(mysql_error());
+      while ($row=mysql_fetch_array($res)){
+         if (isset($_POST[incidencia]) && $row[id] == $_POST[incidencia]){
+            echo "      <option selected value='$row[id]'>$row[nombre]</option>";
+         } else {
+            echo "      <option value='$row[id]'>$row[nombre]</option>";
+         }
+      }
       echo "   </select> </td></tr></table>";
-      echo "   (*) Campo obligatorio <BR>";
+
+      echo "   (*)  Campo obligatorio.<BR>";
+      echo "   (**) Almenos uno, usa CTRL para seleccionar/desseleccionar.<BR>";
       echo "   <input type='submit' value='Enviar' name='enviar'>";
       if (isset($_POST['origen'])){
          echo "   <input  type=hidden name='incidencia'  value=$_POST[incidencia]>";

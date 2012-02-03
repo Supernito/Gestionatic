@@ -98,12 +98,11 @@
       // A diferéncia de l'altre aquí sortirien tots els estats que ha tingut
       $query = "SELECT prob.nombre nombre, prob.descripcion descripcion,
                    u.nombre urgencia, i.nombre impacto, p.nombre prioridad,
-                   inc.nombre incidencia, ep.nombre estado
+                   ep.nombre estado
                FROM ".dbname.".problema prob
                LEFT JOIN ".dbname.".urgencia_prob  u on (u.id        = prob.urgencia)
                LEFT JOIN ".dbname.".impacto_prob   i on (i.id        = prob.impacto)
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
-               LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
                WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
@@ -119,8 +118,15 @@
       echo "<tr><td> <b>Urgencia:</b>      </td><td> $row[urgencia]    </td></tr>";
       echo "<tr><td> <b>Impacto:</b>       </td><td> $row[impacto]     </td></tr>";
       echo "<tr><td> <b>Prioridad:</b>     </td><td> $row[prioridad]   </td></tr>";
-      echo "<tr><td> <b>Incidencia:</b>    </td><td> $row[incidencia]  </td></tr>";
       echo "<tr><td> <b>Estado actual:</b> </td><td> $row[estado]      </td></tr>";
+      echo "<tr><td> <b>Incidencias:</b>   </td><td> </td></tr>";
+      $query = "SELECT id,nombre,descripcion
+                FROM ".dbname.".incidencia
+                WHERE problema=$_GET[ver]";
+      $res   = mysql_query($query) or die(mysql_error());
+      while ($row = mysql_fetch_array($res)){
+         echo "<tr><td> $row[nombre] </td><td> $row[descripcion] </td></tr>";
+      }
       echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
       $query = "SELECT descripcion, username, fecha
                 FROM ".dbname.".estado_prob
@@ -157,8 +163,6 @@
             </td> <td>
                <b><center>Prioridad</center></b>
             </td> <td>
-               <b><center>Incidencia</center></b>
-            </td> <td>
                <b><center>Estado</center></b>
             </td> <td>
                <b><center>Ver</center></b>
@@ -169,12 +173,11 @@
    if ($_GET[borrados] == 'true'){
       $query = "SELECT prob.id id, prob.nombre nombre, prob.descripcion descripcion,
                    u.nombre urgencia, i.nombre impacto, p.nombre prioridad,
-                   inc.nombre incidencia, ep.nombre estado
+                   ep.nombre estado
                FROM ".dbname.".problema prob
                LEFT JOIN ".dbname.".urgencia_prob  u on (u.id        = prob.urgencia)
                LEFT JOIN ".dbname.".impacto_prob   i on (i.id        = prob.impacto)
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
-               LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
                WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
@@ -182,12 +185,11 @@
    } else {
       $query = "SELECT prob.id id, prob.nombre nombre, prob.descripcion descripcion,
                    u.nombre urgencia, i.nombre impacto, p.nombre prioridad,
-                   inc.nombre incidencia, ep.nombre estado
+                   ep.nombre estado
                FROM ".dbname.".problema prob
                LEFT JOIN ".dbname.".urgencia_prob  u on (u.id        = prob.urgencia)
                LEFT JOIN ".dbname.".impacto_prob   i on (i.id        = prob.impacto)
                LEFT JOIN ".dbname.".prioridad_prob p on (p.id        = prob.prioridad)
-               LEFT JOIN ".dbname.".incidencia   inc on (inc.id      = prob.incidencia)
                LEFT JOIN ".dbname.".estado_prob   ep on (ep.problema = prob.id)
                WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_prob
                                WHERE problema = prob.id group by problema) AND
@@ -204,7 +206,6 @@
       echo "   <td><center>$row[urgencia]</center></td>";
       echo "   <td><center>$row[impacto]</center></td>";
       echo "   <td><center>$row[prioridad]</center></td>";
-      echo "   <td><center>$row[incidencia]</center></td>";
       echo "   <td><center>$row[estado]</center></td>";
       echo "   <td><center><a href='gproblemas.php?ver=$row[id]'>
                   <img src='img/view.gif'   alt='Ver' title='Ver detalles'></a></center></td>";

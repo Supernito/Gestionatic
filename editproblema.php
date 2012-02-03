@@ -56,9 +56,8 @@
       
    $query = "SELECT prob.nombre nombre, prob.descripcion descripcion,
                 prob.urgencia urgencia, prob.impacto impacto,
-                prob.prioridad prioridad, inc.nombre incidencia
+                prob.prioridad prioridad
             FROM ".dbname.".problema prob
-            LEFT JOIN ".dbname.".incidencia   inc on (inc.id = prob.incidencia)
             WHERE prob.id = $_GET[id]";
    $res = mysql_query($query) or die(mysql_error());
    $old = mysql_fetch_array($res);
@@ -196,7 +195,10 @@
             echo "      <option value='$row[id]'>$row[nombre]</option>";
          }
       }
-      echo "</table><input type='submit' value='Enviar' name='enviar'>";
+      echo "</table>";
+      echo "(*) Campo obliglatorio.<BR>";
+      echo "Nota: Para agregar una incidencia al problema vaya a la gestión de incidencias.<BR>";
+      echo "<input type='submit' value='Enviar' name='enviar'>";
       echo "<button type='button' onClick=\"location.href='gproblemas.php'\">Cancelar</button>";
       echo "</form>";
    }
