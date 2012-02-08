@@ -1,3 +1,5 @@
 *.conf
 .dropbox
 google*.html
+*.php~
+*.swp

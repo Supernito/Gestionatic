@@ -31,17 +31,11 @@ if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
    $responsable=$_POST['responsable'];
    $aplicacion=$_POST['aplicacion'];
    $diagnostico=$_POST['diagnostico'];
+	$servicio=$_POST['servicio'];
 	//comprobamos que el diagnostico exista
-	$query = mysql_query("SELECT id FROM $dbname.diagnostico WHERE nombre='$diagnostico'") or die(mysql_error());
-	if ($diagnostico && mysql_numrows($query)==0){//no se ha encontrado diagnóstico con ese nombre
-		echo "Diagnóstico no encontrado, revisa haber escrito bien el nombre<br>";
-   	echo "<a href='./gincidencias.php'>Volver al inicio</a>";
-		die();
-	}
 
-
-       $res = mysql_query("INSERT INTO  $dbname.incidencia (nombre, descripcion, fecha, estado, urgencia, nivelescalado, responsable, aplicacion, diagnostico)
-               VALUES ('$nombre',  '$descripcion',  NOW(), '$estado', '$urgencia',  '$nivelescalado', '$responsable', '$aplicacion', '$diagnostico');") or die(mysql_error());
+       $res = mysql_query("INSERT INTO  $dbname.incidencia (nombre, descripcion, fecha, estado, urgencia, nivelescalado, responsable, aplicacion, diagnostico, servicio)
+               VALUES ('$nombre',  '$descripcion',  NOW(), '$estado', '$urgencia',  '$nivelescalado', '$responsable', '$aplicacion', '$diagnostico', '$servicio');") or die(mysql_error());
       mysql_close();
       echo "Incidencia insertada con éxito<br>";
       echo "<a href='./gincidencias.php'>Volver al inicio</a>";
@@ -90,6 +84,20 @@ if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
 					$nombre=$row['nombre'];
 					echo "<option value='$nombre'>$nombre</option>";
 				}
+			?>
+		</select></p>
+			<p>Servicio <select size="1" name="servicio">
+			<option selected value="Sin servicio">Sin servicio</option>
+			<?php
+				mysql_connect(dbhost,dbuser,dbpass); 
+   			mysql_select_db(dbname);
+				$result=mysql_query("SELECT id,nombre FROM $dbname.servicio");
+				while ($row=mysql_fetch_array($result)){
+					$servicio=$row['nombre'];
+					$idserv=$row['id'];
+					echo "<option value='$idserv'>$servicio</option>";
+				}
+				echo "</select></p>";
 			?>
 		</select></p>
       <p><input type='submit' value='enviar' name='enviar'>

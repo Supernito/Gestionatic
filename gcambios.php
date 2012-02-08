@@ -25,8 +25,8 @@
       }
 
       function asegurar2(id) {
-         if (confirm("Este problema será eliminado. ¿Está de acuerdo?")){
-            location.href='gproblemas.php?elim='+id;
+         if (confirm("Esta peticion de cambio será eliminada. ¿Está de acuerdo?")){
+            location.href='gcambios.php?elim='+id;
             return true;
          }
          return false;
@@ -65,10 +65,22 @@
       pie(); die();
    }
 
+   // Miraramos los permisos para gestionar problemas. Los guardamos en $own
+   $query = "SELECT is_admin,g_cambios FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
+   $res   = mysql_query($query) or die(mysql_error());
+   $own   = mysql_fetch_array($res);
+
+   // Si no tiene permisos morimos
+   if ($own[is_admin] == 'false' && $own[g_cambios] == 'false'){
+      echo "No tienes permisos suficientes.";
+      mysql_close;
+      pie();die();
+   }
+
    // Nueva peticion de cambio
    echo "<form action='nuevocambio.php' method='POST'>";
    echo "   <input type='hidden' name='origen'  value='gcambios.php'>";
-   echo "   <input type='submit' class='button' name='nuevoCambio' value='Introducir nueva petición de cambio'/>";
+   echo "   <input type='submit' class='button' name='nuevaPeticion' value='Introducir nueva peticion de cambio'/>";
    echo "</form>";
 
    // Eliminamos la peticion de cambio seleccionada
@@ -76,88 +88,89 @@
       // No se elimina, se pone en el estado eliminado
       $query = "INSERT INTO ".dbname.".estado_peticion
                    (nombre, descripcion, fecha, peticion_cambio)
-                VALUES ('eliminado','Se ha borrado la peticion de cambio', '$_SESSION[username]', NOW(), $_GET[elim])";
+                VALUES ('eliminado','Se ha eliminado el cambio', NOW(), $_GET[elim])";
       mysql_query($query) or die(mysql_error());
-      echo "Se eliminó la peticion de cambio con el identificador $_GET[elim] <BR>";
+      echo "Se eliminó el cambio con el identificador $_GET[elim] <BR>";
    }
 
-   // Detalles de la peticion de cambio seleccionada
+   // Detalles del cambio seleccionado
    if($_GET[ver] && is_numeric($_GET[ver])){
-	  $query = "SELECT cam.nombre nombre, cam.descripcion desc, tc.nombre tipo,  ec.nombre estado
+      // A diferéncia de l'altre aquí sortirien tots els estats que ha tingut
+      $query = "SELECT cam.id id, cam.nombre nombre, cam.descripcion descripcion,
+                   tcam.nombre tipo, prob.nombre problema, ep.nombre estado
                FROM ".dbname.".peticion_cambio cam
-               LEFT JOIN ".dbname.".tipo_cambio     tc on (tc.id              = cam.tipo_cambio)
-               LEFT JOIN ".dbname.".estado_peticion ec on (ec.peticion_cambio = cam.id)
-               WHERE ec.id = (SELECT max(id) FROM ".dbname.".peticion_cambio
-                                             WHERE peticion_cambio = cam.id group by peticion_cambio) AND
-                              cam.id = $_GET[ver]";
+               LEFT JOIN ".dbname.".tipo_cambio     tcam on (tcam.id = cam.tipo_cambio)
+			   LEFT JOIN ".dbname.".problema        prob on (prob.id = cam.problema)
+               LEFT JOIN ".dbname.".estado_peticion   ep on (ep.peticion_cambio = cam.id)
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_peticion
+                               WHERE peticion_cambio = cam.id group by peticion_cambio) AND
+                  cam.id = $_GET[ver]";
       $res = mysql_query($query) or die(mysql_error());
       $row = mysql_fetch_array($res);
-      echo "<H4>Detalles de la petici&oacuten de cambio \"$row[nombre]\":</H4>";
+      echo "<H4>Detalles del cambio \"$row[nombre]\":</H4>";
       $estado = $row[estado];
       echo "<table border='0' cellspacing='0' summary='Detalles del problema'>";
       echo "<tr><td> <b>ID:</b>            </td><td> $_GET[ver]        </td></tr>";
       echo "<tr><td> <b>Nombre:</b>        </td><td> $row[nombre]      </td></tr>";
-	  echo "<tr><td> <b>Tipo:</b>          </td><td> $row[tipo] </td></tr>";
       echo "<tr><td> <b>Descripción:</b>   </td><td> $row[descripcion] </td></tr>";
+      echo "<tr><td> <b>Tipo:</b>          </td><td> $row[tipo]    </td></tr>";
       echo "<tr><td> <b>Estado actual:</b> </td><td> $row[estado]      </td></tr>";
-      echo "<tr><td> <b>Problemas que la generan:</b>     </td><td> </td></tr>";
-      $query = "SELECT nombre
-                FROM ".dbname.".problema
-                WHERE id = $_GET[ver]";
-      $res   = mysql_query($query) or die(mysql_error());
-      while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> <i>$row[nombre]</i></tr>";
-      }
-	  
-	  echo "<tr><td> <b>Items a los que afecta:</b>     </td><td> </td></tr>";
-      $query = "SELECT item.id id, titem.nombre tipo
-                FROM ".dbname.".item_id item
-				LEFT JOIN ".dbname.".tipo_item titem on (tipo.id = item.tipo_item)
-                WHERE item.id = $_GET[ver]";
-      $res   = mysql_query($query) or die(mysql_error());
-      while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> $row[tipo] %row[id]</tr>";
-      }
-	  
-	  echo "<tr><td> <b>Reuniones en las que se ha tratado:</b>     </td><td> </td></tr>";
+	  if (isset($row[problema])){
+          echo "<tr><td> <b>Problema:</b> </td><td> $row[problema]      </td></tr>";
+	  } else {
+	      echo "<tr><td> <b>Problema:</b> </td><td> ninguno  </td></tr>";
+	  }
+      echo "<tr><td> <b>Reuniones:</b>     </td><td> </td></tr>";
       $query = "SELECT descripcion, fecha
                 FROM ".dbname.".reunion
-                WHERE peticion_cambio = $_GET[ver]";
+                WHERE peticion_cambio=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> $row[descripcion]</tr>";
+         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> $row[descripcion] </td></tr>";
       }
-	  
-	  echo "<tr><td> <b>Tareas necesarias:</b>     </td><td> </td></tr>";
-      $query = "SELECT descripcion, fecha, estado
+      
+      echo "<tr><td> <b>Tareas:</b>     </td><td> </td></tr>";
+      $query = "SELECT descripcion, estado, fecha
                 FROM ".dbname.".tarea
-                WHERE peticion_cambio = $_GET[ver]";
+                WHERE peticion_cambio=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> Fecha l&iacutemite: ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> $row[estad] $row[descripcion]</tr>";
+         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> <i>$row[estado]</i> </td><td> $row[descripcion] </td></tr>";
       }
-	  
-	  echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
-      $query = "SELECT nombre, descripcion, fecha,
+
+      echo "<tr><td> <b>Items:</b>     </td><td> </td></tr>";
+      $query = "SELECT item_id.descripcion, titem.nombre tipo
+                FROM ".dbname.".item_id
+				LEFT JOIN ".dbname.".cambio_item     citem on (citem.peticion_cambio = $_GET[ver])
+				LEFT JOIN ".dbname.".tipo_item       titem on (titem.id = item_id.tipo_item)
+                WHERE $_GET[ver] = citem.peticion_cambio AND item_id.id = citem.item AND item_id.padre IS NULL";
+      $res   = mysql_query($query) or die(mysql_error());
+      while ($row = mysql_fetch_array($res)){
+         echo "<tr><td> $row[tipo] </td><td>  $row[desc] </td></tr>";
+      }
+
+      echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
+      $query = "SELECT descripcion, fecha
                 FROM ".dbname.".estado_peticion
-                WHERE peticion_cambio = $_GET[ver]";
+                WHERE peticion_cambio=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td>  $row[nombre] $row[descripcion]</tr>";
+         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> $row[descripcion] </td></tr>";
       }
+      
       echo "</table>";
       if ($estado != 'eliminado'){
-         echo "<button type='button' onClick=\"location.href='editproblema.php?id=$_GET[ver]'\">Editar Problema</button>";
+         echo "<button type='button' onClick=\"location.href='editcambio.php?id=$_GET[ver]'\">Editar Cambio</button>";
          echo "<button type='button' onClick='return asegurar2($_GET[ver]);'>Borrar</button>";
       }
-      echo "<BR><button type='button' onClick=\"location.href='gproblemas.php'\">Ocultar</button>";
+      echo "<BR><button type='button' onClick=\"location.href='gcambios.php'\">Ocultar</button>";
    }
 
    // Peticiones de cambio
    if ($_GET[borrados] == 'true'){
-      echo "<H4><H4>Peticiones de cambio borradas/finalizadas:</H4>";
+      echo "<H4><H4>Cambios Borrados/Completados:</H4>";
    } else {
-      echo "<H4><H4>Peticiones de cambio pendientes:</H4>";
+      echo "<H4><H4>Cambios Pendientes:</H4>";
    }
    echo "<table border='1' cellspacing='0'>";
    echo "<tr> <td>
@@ -165,9 +178,9 @@
             </td> <td>
                <b><center>Nombre</center></b>
             </td> <td>
-               <b><center>Tipo</center></b>
-            </td> <td>
                <b><center>Descripción</center></b>
+            </td> <td>
+               <b><center>Tipo</center></b>
             </td> <td>
                <b><center>Estado</center></b>
             </td> <td>
@@ -178,39 +191,39 @@
 
    if ($_GET[borrados] == 'true'){
       $query = "SELECT cam.id id, cam.nombre nombre, cam.descripcion descripcion,
-                   tc.nombre tipo, ec.nombre estado
+                   tcam.nombre tipo, ep.nombre estado
                FROM ".dbname.".peticion_cambio cam
-               LEFT JOIN ".dbname.".tipo_cambio     tc on (tc.id              = cam.tipo_cambio)
-               LEFT JOIN ".dbname.".estado_peticion ec on (ec.peticion_cambio = cam.id)
-               WHERE ec.id = (SELECT max(id) FROM ".dbname.".peticion_cambio
-                                             WHERE peticion_cambio = cam.id group by peticion_cambio) AND
-                  ec.nombre = 'eliminado'";
+               LEFT JOIN ".dbname.".tipo_cambio     tcam on (tcam.id        = cam.tipo_cambio)
+               LEFT JOIN ".dbname.".estado_peticion   ep on (ep.peticion_cambio = cam.id)
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_peticion
+                               WHERE peticion_cambio = cam.id group by peticion_cambio) AND
+                  ep.nombre = 'eliminado'";
    } else {
       $query = "SELECT cam.id id, cam.nombre nombre, cam.descripcion descripcion,
-                   tc.nombre tipo, ec.nombre estado
+                   tcam.nombre tipo, ep.nombre estado
                FROM ".dbname.".peticion_cambio cam
-               LEFT JOIN ".dbname.".tipo_cambio     tc on (tc.id              = cam.tipo_cambio)
-               LEFT JOIN ".dbname.".estado_peticion ec on (ec.peticion_cambio = cam.id)
-               WHERE ec.id = (SELECT max(id) FROM ".dbname.".peticion_cambio
-                                             WHERE peticion_cambio = cam.id group by peticion_cambio) AND
-                  ec.nombre != 'eliminado'";
+               LEFT JOIN ".dbname.".tipo_cambio     tcam on (tcam.id        = cam.tipo_cambio)
+               LEFT JOIN ".dbname.".estado_peticion   ep on (ep.peticion_cambio = cam.id)
+               WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_peticion
+                               WHERE peticion_cambio = cam.id group by peticion_cambio) AND
+                  ep.nombre != 'eliminado'";
    }
    $res   = mysql_query($query) or die(mysql_error());
    while ($row = mysql_fetch_array($res)) {
       echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
       echo "   <td><center>$row[id]</center></td>";
       echo "   <td><center>$row[nombre]</center></td>";
-	  echo "   <td><center>$row[tipo]</center></td>";
       $descrip = $row[descripcion];
       if (strlen($descrip) > LIM_CAR_DES) $descrip = substr($descrip,0,LIM_CAR_DES - 3)."...";
       echo "   <td><center>$descrip</center></td>";
+      echo "   <td><center>$row[tipo]</center></td>";
       echo "   <td><center>$row[estado]</center></td>";
-      echo "   <td><center><a href='gproblemas.php?ver=$row[id]'>
+      echo "   <td><center><a href='gcambios.php?ver=$row[id]'>
                   <img src='img/view.gif'   alt='Ver' title='Ver detalles'></a></center></td>";
       if ($_GET[borrados] == 'true'){
          echo "   <td><center>-</center></td>";
       } else {
-         echo "   <td><center><a href='gproblemas.php?elim=$row[id]' onclick='return asegurar();'>
+         echo "   <td><center><a href='gcambios.php?elim=$row[id]' onclick='return asegurar();'>
                      <img src='img/delete.gif' alt='Borrar' title='Borrar'></a></center></td>";
       }
       echo "</tr>";

@@ -20,7 +20,7 @@
       $res = mysql_query($query) or die(mysql_error());
       $row = mysql_fetch_array($res);
       if ($row[is_admin] == 'true' || $row[g_serv] == 'true'){
-         echo "<a href='./'>Gestión de Servicios</a>(pendiente)<BR>"; $opciones++;
+         echo "<a href='./gservicios.php'>Gestión de Servicios</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_inc] == 'true'){
          echo "<a href='./gincidencias.php'>Gestión de Incidencias</a><BR>"; $opciones++;
@@ -32,7 +32,7 @@
          echo "<a href='./'>Gestión de Configuraciones</a>(pendiente)<BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_cambios] == 'true'){
-         echo "<a href='./'>Gestión de Cambios</a>(pendiente)<BR>"; $opciones++;
+         echo "<a href='./gcambios.php'>Gestión de Cambios</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_ver] == 'true'){
          echo "<a href='./'>Gestión de Versiones</a>(pendiente)<BR>"; $opciones++;
@@ -60,6 +60,15 @@
          echo "<a href='./'>Gestión de la seguridad</a>(pendiente)<BR>"; $opciones++;
       }
 */
+      if ($row[is_admin] == 'true' || $row[alertas] == 'true'){
+         echo "<HR>";
+         echo "<H4>Alertas:</H4>";
+         $alertas = 0;
+
+         if ($alertas == 0){
+            echo "<p>No hay ninguna alerta de la que preocuparse.</p>";
+         }
+      }
       if ($opciones == 0){
          echo "<p>No tienes ninguna opción disponible, contacta con un administrador.</p>";
       }

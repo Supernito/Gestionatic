@@ -59,7 +59,7 @@
       }
 
       // Hay un usuario logueado
-	$loggedu = $_SESSION['username'];
+		$loggedu = $_SESSION['username'];
       echo "<p>Bienvenido ".$loggedu.", Quiz&aacute quieras ver los <a href='diagnosticos.php'>diagn&oacutesticos</a> o las <a href='soluciones.php'>soluciones</a></p><HR>";
 
       $query = "SELECT id,is_admin FROM $dbname.usuario WHERE username='$loggedu'";
@@ -90,8 +90,10 @@
 			echo "<tr><td><b>Responsable:</b></td><td> ".$row['responsable']."</td></tr>";
 			echo "<tr><td><b>Aplicaci&oacuten:</b></td><td> ".$row['aplicacion']."</td></tr>";
 			echo "<tr><td><b>Diagn&oacutestico:</b></td><td> ".$row['diagnostico']."</td></tr>";
+			echo "<tr><td><b>Servicio:</b></td><td> ".$row['servicio']."</td></tr>";
 			$diagnostico=$row['diagnostico'];
 			$problema=$row['problema'];
+			$servicio=$row['servicio'];
 			//imprimimos la solución al diagnóstico si lo hay
 			$resultdiag=mysql_query("SELECT * FROM $dbname.diagnostico WHERE nombre='$diagnostico'") or die(mysql_error());
 			if (mysql_numrows($resultdiag)!=0){//no se ha encontrado diagnóstico con ese nombre
@@ -116,6 +118,13 @@
 				$resultprob=mysql_fetch_array($resultprob);
 				$nombreprob=$resultprob['nombre'];
 				echo "<tr><td><b>Problema asociado:</b></td><td> <a href='./gproblemas.php?ver=$problema'>$nombreprob</a> </td></tr>";
+			}
+			//imprimimos el servicio asociado si lo hay
+			if ($servicio){
+				$resserv=mysql_query("SELECT nombre FROM $dbname.servicio WHERE id='$servicio'") or die(mysql_error());
+				$resserv=mysql_fetch_array($resserv);
+				$nombreserv=$resserv['nombre'];
+				echo "<tr><td><b>Servicio asociado:</b></td><td> <a href='./gservicios.php?ver=$servicio'>$nombreserv</a> </td></tr>";
 			}
 			echo "</table>";
 	  

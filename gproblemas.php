@@ -125,7 +125,7 @@
                 WHERE problema=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> $row[nombre] </td><td> $row[descripcion] </td></tr>";
+         echo "<tr><td> <a href='gincidencias.php?ver=$row[id]'>$row[nombre]</a> </td><td> $row[descripcion] </td></tr>";
       }
       echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
       $query = "SELECT descripcion, username, fecha
@@ -145,9 +145,9 @@
 
    // Problemas
    if ($_GET[borrados] == 'true'){
-      echo "<H4><H4>Problemas Borrados/Solucionados:</H4>";
+      echo "<H4>Problemas Borrados/Solucionados:</H4>";
    } else {
-      echo "<H4><H4>Problemas Existentes:</H4>";
+      echo "<H4>Problemas Existentes:</H4>";
    }
    echo "<table border='1' cellspacing='0'>";
    echo "<tr> <td>
