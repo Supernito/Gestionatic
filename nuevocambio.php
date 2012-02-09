@@ -114,7 +114,6 @@
       }
       echo "   </select> </td></tr>";
       echo "   <tr><td>Problema </td><td> <select name='problema'>";
-	  echo "   <option></option>";
       $query = "SELECT id, nombre from ".dbname.".problema";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row=mysql_fetch_array($res)){

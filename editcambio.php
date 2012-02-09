@@ -76,15 +76,13 @@
          $num   = $row['num'];
 
          if ($num=='0'){
-            $query = "UPDATE ".dbname.".peticion_cambio SET nombre = '$_POST[nombre]' WHERE id = $_GET[id]"; //<----------- ESTO DA PROBLEMAS!!!
-echo $query."<BR>";
+            $query = "UPDATE ".dbname.".peticion_cambio SET nombre = '$_POST[nombre]' WHERE id = $_POST[id_cam]";
             $res = mysql_query($query) or die(mysql_error());
-echo "Lo anterior ha ido bien<BR>";
- /*           $query = "INSERT INTO ".dbname.".estado_peticion
+            $query = "INSERT INTO ".dbname.".estado_peticion
                          (nombre, descripcion, fecha, peticion_cambio)
                       VALUES ('modificado','Se ha cambiado el nombre de \"$old[nombre]\" a \"$_POST[nombre]\".',
                               NOW(), $_POST[id_cam])";
- */           $res = mysql_query($query) or die(mysql_error());
+            $res = mysql_query($query) or die(mysql_error());
          } else {
             echo "Ya existe una peticion de cambio activa con este nombre.<BR>";
             echo "<button type='button' onClick=\"location.href='gcambios.php'\">Volver</button>";
@@ -92,7 +90,7 @@ echo "Lo anterior ha ido bien<BR>";
             pie(); die();
          }
      }
-/*
+
       // Descripción
       $descripcion = mysql_real_escape_string(trim(strip_tags(stripslashes($_POST[descripcion]))));
       $descripcion = str_replace('\\n', '<br>', $descripcion);
@@ -100,39 +98,39 @@ echo "Lo anterior ha ido bien<BR>";
          $query = "UPDATE ".dbname.".peticion_cambio SET descripcion = '$descripcion' WHERE id = $_POST[id_cam]";
          $res = mysql_query($query) or die(mysql_error());
          $query = "INSERT INTO ".dbname.".estado_peticion
-                      (nombre, descripcion, fecha, peticion_cambio)
+                         (nombre, descripcion, fecha, peticion_cambio)
                    VALUES ('modificado','Se ha cambiado la descripción.',
                             NOW(), $_POST[id_cam])";
          $res = mysql_query($query) or die(mysql_error());
       }
-*/
+
       // Tipo de cambio
- /*     if ($old[tipo_cambio] != $_POST[tipo_cambio]){
-         $query = "UPDATE ".dbname.".peticion_cambio SET tipo_cambio = '$_POST[tipo_cambio]' WHERE id = $_POST[id_cam]";
+      if ($old[tipo] != $_POST[tcambio]){
+         $query = "UPDATE ".dbname.".peticion_cambio SET tipo_cambio = '$_POST[tcambio]' WHERE id = $_POST[id_cam]";
          $res = mysql_query($query) or die(mysql_error());
-         $query = "SELECT nombre u_old, (SELECT nombre FROM ".dbname.".tipo_cambio WHERE id=$_POST[tipo_cambio]) u_new
-                     FROM ".dbname.".tipo_cambio WHERE id=$old[tipo_cambio]";
+		 $query = "SELECT nombre t_old, (SELECT nombre FROM ".dbname.".tipo_cambio WHERE id=$_POST[tcambio]) t_new
+                     FROM ".dbname.".tipo_cambio WHERE id=$old[tipo]";
          $res = mysql_query($query) or die(mysql_error());
          $row = mysql_fetch_array($res);
          $query = "INSERT INTO ".dbname.".estado_peticion
-                      (nombre, descripcion, fecha, peticion_cambio)
-                   VALUES ('modificado','Se ha cambiado el tipo de \"$row[u_old]\" a \"$row[u_new]\".',
-                            NOW(), $_POST[id_prob])";
+                         (nombre, descripcion, fecha, peticion_cambio)
+                   VALUES ('modificado','Se ha cambiado el problema de \"$row[t_old]\" a \"$row[t_new]\".',
+                           NOW(), $_POST[id_cam])";
          $res = mysql_query($query) or die(mysql_error());
       }
-*/
+
       // Problema
       if ($old[problema] != $_POST[problema]){
          $query = "UPDATE ".dbname.".peticion_cambio SET problema = '$_POST[problema]' WHERE id = $_POST[id_cam]";
          $res = mysql_query($query) or die(mysql_error());
-         $query = "SELECT nombre i_old, (SELECT nombre FROM ".dbname.".problema WHERE id=$_POST[problema]) i_new
+         $query = "SELECT nombre p_old, (SELECT nombre FROM ".dbname.".problema WHERE id=$_POST[problema]) p_new
                      FROM ".dbname.".problema WHERE id=$old[problema]";
          $res = mysql_query($query) or die(mysql_error());
          $row = mysql_fetch_array($res);
          $query = "INSERT INTO ".dbname.".estado_peticion
-                      (nombre, descripcion, fecha, peticion_cambio)
-                   VALUES ('modificado','Se ha cambiado el problema de \"$row[i_old]\" a \"$row[i_new]\".',
-                           NOW(), $_POST[id_prob])";
+                         (nombre, descripcion, fecha, peticion_cambio)
+                   VALUES ('modificado','Se ha cambiado el problema de \"$row[p_old]\" a \"$row[p_new]\".',
+                           NOW(), $_POST[id_cam])";
          $res = mysql_query($query) or die(mysql_error());
       }
 
@@ -143,7 +141,7 @@ echo "Lo anterior ha ido bien<BR>";
 
       // Formulario
       echo "<form method='post' action='$PHP_SELF' name='formeditcambio' onsubmit='return validaFormulario();'>";
-      echo "   <input type='hidden' name='id_prob'  value='$_GET[id]'>";
+      echo "   <input type='hidden' name='id_cam'  value='$_GET[id]'>";
       echo "<H4>Editar el cambio \"$old[nombre]\":</H4>";
       echo "<table border='0' cellspacing='0' summary='Editar el cambio'>";
       echo "   <tr><td>Nombre(*) </td>
@@ -151,11 +149,11 @@ echo "Lo anterior ha ido bien<BR>";
       $descripcion = str_replace('<br>', '\\n', $old[descripcion]);
       echo "   <tr><td>Descripción </td>
                <td> <textarea rows='5' name='descripcion' cols='28'>$descripcion</textarea> </td></tr>";
-      echo "   <tr><td>Tipo de cambio </td><td> <select name='tipo_cambio'>";
+      echo "   <tr><td>Tipo de cambio </td><td> <select name='tcambio'>";
       $query = "SELECT id, nombre from ".dbname.".tipo_cambio";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row=mysql_fetch_array($res)){
-         if ($old[tip_cambio] == $row[id]){
+         if ($old[tipo] == $row[id]){
             echo "      <option selected value='$row[id]'>$row[nombre]</option>";
          } else {
             echo "      <option value='$row[id]'>$row[nombre]</option>";
@@ -165,7 +163,7 @@ echo "Lo anterior ha ido bien<BR>";
       $query = "SELECT id, nombre from ".dbname.".problema";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row=mysql_fetch_array($res)){
-         if ($old[impacto] == $row[id]){
+         if ($old[problema] == $row[id]){
             echo "      <option selected value='$row[id]'>$row[nombre]</option>";
          } else {
             echo "      <option value='$row[id]'>$row[nombre]</option>";
