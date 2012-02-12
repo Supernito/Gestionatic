@@ -79,7 +79,7 @@
 			if ($isadmin=='true'){
 				echo "<button type=button onClick=\"location.href='elimdiagnostico.php?id=$id'\">Eliminar diagnóstico</button>";
 				echo "<button type=button onClick=\"location.href='editdiagnostico.php?id=$id'\">Editar diagnóstico</button>";
-				echo "<button type=button onClick=\"location.href='solucionadiagnostico.php?id=$id'\">Agregar solución</button>";
+				echo "<button type=button onClick=\"location.href='solucionadiagnostico.php?iddiag=$id'\">Agregar solución</button>";
       	}
 			echo "<td><button type='button' onClick=\"location.href='diagnosticos.php'\">Ocultar</button>";
 		}

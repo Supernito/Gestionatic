@@ -109,7 +109,7 @@
       $row = mysql_fetch_array($res);
       echo "<H4>Detalles del cambio \"$row[nombre]\":</H4>";
       $estado = $row[estado];
-      echo "<table border='0' cellspacing='0' summary='Detalles del problema'>";
+      echo "<table border='0' cellspacing='0' summary='Detalles del cambio'>";
       echo "<tr><td> <b>ID:</b>            </td><td> $_GET[ver]        </td></tr>";
       echo "<tr><td> <b>Nombre:</b>        </td><td> $row[nombre]      </td></tr>";
       echo "<tr><td> <b>Descripción:</b>   </td><td> $row[descripcion] </td></tr>";
@@ -120,35 +120,36 @@
 	  } else {
 	      echo "<tr><td> <b>Problema:</b> </td><td> ninguno  </td></tr>";
 	  }
-      echo "<tr><td> <b>Reuniones:</b>     </td><td> </td></tr>";
+      echo "<tr><td> <b>Reuniones:</b>     </td></tr>";
       $query = "SELECT descripcion, fecha
                 FROM ".dbname.".reunion
                 WHERE peticion_cambio=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> $row[descripcion] </td></tr>";
+         echo "<tr><td> </td><td> $row[fecha] </td><td> $row[descripcion] </td></tr>";
       }
       
-      echo "<tr><td> <b>Tareas:</b>     </td><td> </td></tr>";
+      echo "<tr><td> <b>Tareas:</b>     </td></tr>";
       $query = "SELECT descripcion, estado, fecha
                 FROM ".dbname.".tarea
                 WHERE peticion_cambio=$_GET[ver]";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> ".date(dateadd("suma",$row[fecha],0,0,0,6,0,0))." </td><td> <i>$row[estado]</i> </td><td> $row[descripcion] </td></tr>";
+         echo "<tr><td></td><td> $row[fecha] </td> <td> $row[descripcion] </td> <td>  <i>$row[estado]</i> </td></tr>";
       }
 
       echo "<tr><td> <b>Items:</b>     </td><td> </td></tr>";
       $query = "SELECT item_id.descripcion, titem.nombre tipo
-                FROM ".dbname.".item_id
-				LEFT JOIN ".dbname.".cambio_item     citem on (citem.peticion_cambio = $_GET[ver])
+                FROM ".dbname.".cambio_item citem
+				LEFT JOIN ".dbname.".item_id               on (citem.item = item_id.id)
 				LEFT JOIN ".dbname.".tipo_item       titem on (titem.id = item_id.tipo_item)
-                WHERE $_GET[ver] = citem.peticion_cambio AND item_id.id = citem.item AND item_id.padre IS NULL";
+                WHERE $_GET[ver] = citem.peticion_cambio";
       $res   = mysql_query($query) or die(mysql_error());
       while ($row = mysql_fetch_array($res)){
-         echo "<tr><td> $row[tipo] </td><td>  $row[desc] </td></tr>";
+         echo "<tr><td> $row[tipo] </td><td>  $row[descripcion] </td></tr>";
       }
-
+	  echo "</table>";
+      echo "<table border='0' cellspacing='0' summary='Historial del cambio'>";
       echo "<tr><td> <b>Historial:</b>     </td><td> </td></tr>";
       $query = "SELECT descripcion, fecha
                 FROM ".dbname.".estado_peticion
@@ -163,7 +164,7 @@
          echo "<button type='button' onClick=\"location.href='editcambio.php?id=$_GET[ver]'\">Editar Cambio</button>";
          echo "<button type='button' onClick='return asegurar2($_GET[ver]);'>Borrar</button>";
       }
-      echo "<BR><button type='button' onClick=\"location.href='gcambios.php'\">Ocultar</button>";
+      echo "<br><button type='button' onClick=\"location.href='gcambios.php'\">Ocultar</button></br>";
    }
 
    // Peticiones de cambio

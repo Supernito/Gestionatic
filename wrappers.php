@@ -14,7 +14,7 @@ function cabecera($titulo){
             window.location.href='register.php';
          }
       </script>
-
+      <script language='javascript' src='calendar/calendar.js'></script>
    </head>
    <body>
       <div id='cabecera'>

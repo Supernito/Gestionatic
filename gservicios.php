@@ -85,6 +85,12 @@
       echo "<tr><td> <b>Nombre:</b>        </td><td> $row[nombre]      </td></tr>";
       echo "<tr><td> <b>Descripción:</b>   </td><td> $row[descripcion] </td></tr>";
       echo "</table>";
+/*	  
+      echo "<td><form method='post' action='editservicio.php'>
+					<input type='hidden' name='servicio' value='$id'>
+					<input type='submit' class='button' name='editservicio' value='Editar servicio'/>
+					</form></td>";
+*/
       echo "<button type='button' onClick='return asegurar2($_GET[ver]);'>Borrar</button>";
    }
 

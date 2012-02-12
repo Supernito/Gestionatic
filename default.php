@@ -29,7 +29,7 @@
          echo "<a href='./gproblemas.php'>Gestión de Problemas</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_conf] == 'true'){
-         echo "<a href='./'>Gestión de Configuraciones</a>(pendiente)<BR>"; $opciones++;
+         echo "<a href='./gconfiguracion.php'>Gestión de Configuraciones</a>(construyendo)<BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_cambios] == 'true'){
          echo "<a href='./gcambios.php'>Gestión de Cambios</a><BR>"; $opciones++;
@@ -163,13 +163,13 @@
         data.addColumn('string', 'Dia');
         data.addColumn('number', 'Incidencias');
         data.addRows([
-          ['$lin[DIAa]', $lin[DIA1]],
-          ['$lin[DIAb]', $lin[DIA2]],
-          ['$lin[DIAc]', $lin[DIA3]],
-          ['$lin[DIAd]', $lin[DIA4]],
-          ['$lin[DIAe]', $lin[DIA5]],
+          ['$lin[DIAg]', $lin[DIA7]],
           ['$lin[DIAf]', $lin[DIA6]],
-          ['$lin[DIAg]', $lin[DIA7]]
+          ['$lin[DIAe]', $lin[DIA5]],
+          ['$lin[DIAd]', $lin[DIA4]],
+          ['$lin[DIAc]', $lin[DIA3]],
+          ['$lin[DIAb]', $lin[DIA2]],
+          ['$lin[DIAa]', $lin[DIA1]]
         ]);
 
         var options = {

@@ -6,9 +6,10 @@
 	session_start(); 
    mysql_connect(dbhost,dbuser,dbpass); 
    mysql_select_db(dbname);
-	$id_diag= $_GET['id'];
+	
  
 if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
+   $id_diag= $_POST['iddiag'];
 
    // Miraramos los permisos para gestionar incidencias. Los guardamos en $own
    $query = "SELECT is_admin,g_inc FROM ".dbname.".usuario WHERE username='$_SESSION[username]'";
@@ -22,7 +23,7 @@ if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
       pie();die();
    }
 
-	$nombre=$_POST['nombre'];
+	$nombre=$_POST['solucion'];
 
 	$query = mysql_query("SELECT id FROM $dbname.solucion WHERE nombre='$nombre'");
 	if (mysql_numrows($query)==0){//no se ha encontrado la solución con ese nombre
@@ -40,22 +41,24 @@ if(isset($_POST['enviar']) && $_SESSION['logged']==true) {
    echo "Solución agregada con éxito al diagnóstico<br>";
    echo "<a href='./gincidencias.php'>Volver al inicio</a>";
  
-   } else {
+} else {
  
-      // Formulario 
-   	echo "<form method='post' action='$PHP_SELF'>
-      	<p>Solución <select size='1' name='Solución'>
-			<option selected value='Sin solución'>Sin solución</option>";
-		$result=mysql_query("SELECT nombre FROM $dbname.solucion");
-		while ($row=mysql_fetch_array($result)){
-			$nombre=$row['nombre'];
-			echo "<option value='$nombre'>$nombre</option>";
-		}
-		echo "</select></p>
+   // Formulario 
+	echo "<form method='post' action='$PHP_SELF'>
+    	<p>solucion <select size='1' name='solucion'>
+   	<option selected value='Sin solución'>Sin solución</option>";
+	$result=mysql_query("SELECT nombre FROM $dbname.solucion");
+	while ($row=mysql_fetch_array($result)){
+		$nombre=$row['nombre'];
+		echo "<option value='$nombre'>$nombre</option>";
+	}
+   $iddiag=$_GET['iddiag'];
+   echo "$iddiag";
+	echo "</select></p>
+      <input type='hidden' name='iddiag' value='$iddiag'>
       <p><input type='submit' value='enviar' name='enviar'>
-   </form>";
- 
-
+      
+      </form>";
 	}
 	
    pie();

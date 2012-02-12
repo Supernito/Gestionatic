@@ -1,6 +1,10 @@
 # Do not remove this line, otherwise mod_rewrite rules will stop working
 RewriteBase /
 
+ <Files db.conf>
+Order allow,deny
+Deny from all
+</Files>
 ErrorDocument 404 "Página no encontrada"
 ErrorDocument 403 "Acceso prohibido"
 Options -Indexes

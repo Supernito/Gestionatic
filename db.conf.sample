@@ -1,0 +1,6 @@
+<?php
+   define (dbhost,'localhost');
+   define (dbuser,'');
+   define (dbpass,'');
+   define (dbname,'');
+?>

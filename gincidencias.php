@@ -21,7 +21,7 @@
       }
 
    </script>
-
+   
 <?php
 
   mysql_connect(dbhost,dbuser,dbpass); 
@@ -59,7 +59,7 @@
       }
 
       // Hay un usuario logueado
-		$loggedu = $_SESSION['username'];
+	  $loggedu = $_SESSION['username'];
       echo "<p>Bienvenido ".$loggedu.", Quiz&aacute quieras ver los <a href='diagnosticos.php'>diagn&oacutesticos</a> o las <a href='soluciones.php'>soluciones</a></p><HR>";
 
       $query = "SELECT id,is_admin FROM $dbname.usuario WHERE username='$loggedu'";
@@ -90,7 +90,6 @@
 			echo "<tr><td><b>Responsable:</b></td><td> ".$row['responsable']."</td></tr>";
 			echo "<tr><td><b>Aplicaci&oacuten:</b></td><td> ".$row['aplicacion']."</td></tr>";
 			echo "<tr><td><b>Diagn&oacutestico:</b></td><td> ".$row['diagnostico']."</td></tr>";
-			echo "<tr><td><b>Servicio:</b></td><td> ".$row['servicio']."</td></tr>";
 			$diagnostico=$row['diagnostico'];
 			$problema=$row['problema'];
 			$servicio=$row['servicio'];

@@ -30,7 +30,7 @@
 
    <script type="text/javascript">
       function validaFormulario(){
-         var x = document.forms.formnuevoproblema.nombre.value;
+         var x = document.forms.formnuevocambio.nombre.value;
          if(x==null || x==""){
             alert("Algunos campos no pueden estar vacios.");
             return false;               
@@ -78,7 +78,7 @@
       $id = mysql_insert_id ();
       $query = "INSERT INTO ".dbname.".estado_peticion
                    (nombre, descripcion, fecha, peticion_cambio)
-                VALUES ('creado','Se ha creado la peticion de cambio', NOW(), $id)";
+                VALUES ('pendiente','Se ha creado la peticion de cambio', NOW(), $id)";
       $res = mysql_query($query) or die(mysql_error());
       echo "Peticion de cambio creada con éxito.<BR>";
 

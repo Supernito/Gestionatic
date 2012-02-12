@@ -72,7 +72,7 @@
 			//opciones de edición, solo para administradores
       	if ($isadmin=='true'){
 				echo "<button type=button onClick=\"location.href='elimsolucion.php?id=$id'\">Eliminar solución</button>";
-				echo "<button type=button onClick=\"location.href='editsolucion.php?id=$id'\">Eliminar solución</button>";
+				echo "<button type=button onClick=\"location.href='editsolucion.php?id=$id'\">Editar solución</button>";
       	}
 			echo "<td><button type='button' onClick=\"location.href='soluciones.php'\">Ocultar</button>";
 		}
