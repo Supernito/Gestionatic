@@ -8,7 +8,7 @@
    session_start(); 
    mysql_connect(dbhost,dbuser,dbpass); 
    mysql_select_db(dbname);
-   $id= $_POST['idincidencia'];
+   $id= $_GET['idincidencia'];
    $loggedu = $_SESSION['username'];
    $query = mysql_query("SELECT is_admin,g_inc FROM $dbname.usuario WHERE username='$loggedu'");
    $row = mysql_fetch_array($query);

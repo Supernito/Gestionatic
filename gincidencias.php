@@ -1,7 +1,7 @@
 <?php
 	include 'db.conf';
 	include 'wrappers.php';
-	define (LIM_CAR_DES,'30'); // CarÃ¡cteres a mostrar en DescripciÃ³n
+	define (LIM_CAR_DES,'30'); // Carácteres a mostrar en Descripción
 
   cabecera("Gestion de incidencias");
 ?>
@@ -17,7 +17,7 @@
       }
 
       function asegurar() {
-         return confirm("Esta entrada serÃ¡ eliminada. Â¿EstÃ¡ de acuerdo?");
+         return confirm("Esta entrada será eliminada. ¿Está de acuerdo?");
       }
 
    </script>
@@ -93,9 +93,9 @@
 			$diagnostico=$row['diagnostico'];
 			$problema=$row['problema'];
 			$servicio=$row['servicio'];
-			//imprimimos la soluciÃ³n al diagnÃ³stico si lo hay
+			//imprimimos la solución al diagnóstico si lo hay
 			$resultdiag=mysql_query("SELECT * FROM $dbname.diagnostico WHERE nombre='$diagnostico'") or die(mysql_error());
-			if (mysql_numrows($resultdiag)!=0){//no se ha encontrado diagnÃ³stico con ese nombre
+			if (mysql_numrows($resultdiag)!=0){//no se ha encontrado diagnóstico con ese nombre
 				$rowdiag = mysql_fetch_array($resultdiag);
 				$iddiag = $rowdiag['id'];
 				echo "<tr><td><b>Descripci&oacuten del diagn&oacutestico:</b></td><td> ".$rowdiag['descripcion']."</td></tr>";
@@ -127,7 +127,7 @@
 			}
 			echo "</table>";
 	  
-	  //opciones de ediciÃ³n, solo para administradores
+	  //opciones de edición, solo para administradores
       
 		if ($isadmin=='true' || $own[g_inc]=='true'){
 			$id=$row['id'];
@@ -139,11 +139,10 @@
 					<input type='submit' class='button' name='editincidencia' value='Editar incidencia'/>
 					</form></td>";
 
-			echo "<td><form method='post' action='elimincidencia.php'>
-					<input type='hidden' name='idincidencia' value='$id'>
+			echo "<td><form method='post' action='elimincidencia.php?idincidencia=$id'>
 					<input type='submit' class='button' name='elimincidencia' value='Eliminar incidencia'/>
 					</form></td>";
-			if (!$problema){//sÃ³lo si no hay problema asociado se puede elevar a problema
+			if (!$problema){//sólo si no hay problema asociado se puede elevar a problema
 				echo "<td><form method='post' action='nuevoproblema.php'>
 						<input type='hidden' name='origen'  value='gincidencias.php'>
 						<input type='hidden' name='incidencia'  value='$id'>
@@ -161,7 +160,7 @@
 		echo "<td><button type='button' onClick=\"location.href='gincidencias.php'\">Ocultar</button>";
 	}
 	//imprimimos la tabla con todas las incidencias
-	//impresiÃ³n de la primera fila
+	//impresión de la primera fila
 	echo "<table border='1' cellspacing='0'>";
 	echo "<tr> <td>
                <b><center>Id</center></b>
@@ -191,7 +190,7 @@
 		$fecha=$row['fecha'];
 		$fecha=dateadd($suma,$fecha,0,0,0,6,0,0);
 		$fecha=date($fecha);
-		//aquÃƒÂ­ se imprimen las incidencias
+		//aquÃ­ se imprimen las incidencias
 		echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
 		echo "<td> ".$id."</td>";
 		echo "<td> ".$row['nombre']."</td>";
@@ -205,7 +204,7 @@
 		echo "<td>".$row['responsable']."</td>";
 		echo "   <td><center><a href='gincidencias.php?ver=$row[id]'>
       			<img src='img/view.gif'   alt='Ver' title='Ver detalles'></a></center></td>";
-		echo "   <td><center><a href='elimincidencia.php?id=$row[id]' onclick='return asegurar();'>
+		echo "   <td><center><a href='elimincidencia.php?idincidencia=$row[id]' onclick='return asegurar();'>
                <img src='img/delete.gif' alt='Borrar' title='Borrar'></a></center></td>";	
 	}
 	echo "</tr> </table>";

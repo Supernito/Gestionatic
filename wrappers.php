@@ -1,4 +1,5 @@
 <?php
+session_start();
 function cabecera($titulo){
    echo "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
 <html lang='es'>
@@ -7,7 +8,7 @@ function cabecera($titulo){
       <meta http-equiv='Content-Type' content='text/html; charset= iso-8859-1'>
       <meta name='description'        content='Web para la gestión de servicios basada en itil'>
       <meta name='robots'             content='NOINDEX'>
-      <link rel ='stylesheet' type='text/css' href='/css/estilo.css'>
+      <link rel ='stylesheet' type='text/css' href='./css/estilo.css'>
 
       <script type='text/javascript'>
          function Registro() {
@@ -23,7 +24,6 @@ function cabecera($titulo){
          </div>
          <div id='login'>";
 
-   session_start();  
    if ($_SESSION['logged']!=true) {
       //si no está logeado imprimimos el formulario
 
@@ -41,13 +41,13 @@ function cabecera($titulo){
 
 function pie(){
    echo "<BR><div id='pie'><center><BR>";
-   echo "<button type='button' onClick=\"location.href='./'\">
+   echo "<button type='button' onClick=\"location.href='./default.php'\">
             Página Principal
          </button> ";
-   echo "<button type='button' onClick=\"location.href='/download/SITGESTIONATICManualdeusuario.pdf'\">
+   echo "<button type='button' onClick=\"location.href='./download/SITGESTIONATICManualdeusuario.pdf'\">
             Manual de usuario
          </button> ";
-   echo "<button type='button' onClick=\"location.href='/download/SITGESTIONATICManualdeinstalacion.pdf'\">
+   echo "<button type='button' onClick=\"location.href='./download/SITGESTIONATICManualdeinstalacion.pdf'\">
             Manual de instalación
          </button> ";
    echo "<button type='button' onClick=\"location.href='https://github.com/Supernito/Gestionatic'\">
@@ -57,6 +57,5 @@ function pie(){
       </div> <!--CONTENIDO-->
    </body>
 </html>";
-
 }
 ?>

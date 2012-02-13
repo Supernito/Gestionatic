@@ -29,7 +29,7 @@
          echo "<a href='./gproblemas.php'>Gestión de Problemas</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_conf] == 'true'){
-         echo "<a href='./gconfiguracion.php'>Gestión de Configuraciones</a>(construyendo)<BR>"; $opciones++;
+         echo "<a href='./gconfiguracion.php'>Gestión de Configuraciones</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_cambios] == 'true'){
          echo "<a href='./gcambios.php'>Gestión de Cambios</a><BR>"; $opciones++;

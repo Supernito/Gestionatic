@@ -114,7 +114,18 @@
       echo "<tr><td> <b>Descripción:</b>   </td><td> $row[descripcion] </td></tr>";
       echo "<tr><td> <b>Tipo:</b>          </td><td> $row[tipo]    </td></tr>";
       echo "<tr><td> <b>Estado actual:</b> </td><td> $row[estado]      </td></tr>";
-	  echo "<tr><td> <b>Padre:</b> 		   </td><td> $row[padre]      </td></tr>";
+	  
+	  
+	  
+	
+	 // echo "<tr><td> <b>Padre:</b> 		   </td><td> $row[padre]      </td></tr>";
+	  		if  ($row[padre] == '0'){
+			  echo "<tr><td> <b>Padre:</b></td><td>Ninguno</td></tr>";
+		} else {
+			 echo "<tr><td> <b>Padre:</b> 		   </td><td> $row[padre]      </td></tr>";
+		}
+	  
+	  
 	 /* if (isset($row[problema])){
           echo "<tr><td> <b>Problema:</b> </td><td> $row[problema]      </td></tr>";
 	  } else {
@@ -239,8 +250,11 @@
       echo "   <td><center>$row[tipo]</center></td>";
       echo "   <td><center>$row[estado]</center></td>";
 	  //echo "   <td><center>$padre</center></td>";
-	  echo "   <td><center><a href='gconfiguracion.php?ver=$padre'>$padre</a></center></td>";
-	  
+		if  ($padre == '0'){
+			 echo "   <td><center></center></td>";
+		} else {
+			echo "   <td><center><a href='gconfiguracion.php?ver=$padre'>$padre</a></center></td>";
+		}
 	  
 	  
 	  

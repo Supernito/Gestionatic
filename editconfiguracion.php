@@ -280,14 +280,49 @@
          }
          echo "   </select> </td></tr>";
 	  }
-
 	  
+	  //tabla de servicios
+	   echo "<H4></H4>";
+	  echo "   <tr><td>Servicios </td>";
+	  echo "   <td>";		
+	  $query = "SELECT servicio.id, servicio.nombre
+                FROM ".dbname.".serv_item sitem
+				LEFT JOIN ".dbname.".servicio               on (sitem.item = servicio.id)
+                WHERE $_GET[id] = sitem.item";
+      $res   = mysql_query($query) or die(mysql_error());
+	  //if(mysql_num_rows($res) != 0){
+	      echo "<table border='1' cellspacing='0'>";
+          echo "<tr> <td>
+                   <b><center>Id</center></b>
+                </td> <td>
+                   <b><center>Nombre</center></b>
+                </td> <td>
+                   <b><center>Borrar</center></b>
+                </td> </tr>";
 	  
-
+    	  while ($row = mysql_fetch_array($res)) {
+	          echo "<tr onMouseOver='resaltaLinia(this)' onMouseOut='restauraLinia(this)'>";
+	          echo "   <td><center>$row[id]</center></td>";
+	          $nom = $row[nombre];
+	          if (strlen($nom) > LIM_CAR_DES) $nom = substr($nom,0,LIM_CAR_DES - 3)."...";
+    	      echo "   <td><center>$nom</center></td>";
+	          if ($_GET[borrados] == 'true'){
+		         echo "   <td><center>-</center></td>";
+	          } else {
+		         echo "   <td><center><a href='editconfiguracion.php?id=$_GET[id]&i_elim=$row[id]' onclick='return asegurar_i();'>
+                              <img src='img/delete.gif' alt='Borrar' title='Borrar'></a></center></td>";
+	          }
+	          echo "</tr>";
+	      }
+		  echo "   </td>";
+          echo "</table></td></tr>";
+     // }
 	  
 
 	  
 	  echo "</table>";
+	  
+	  echo "<H4></H4>";
       echo "(*) Campo obliglatorio.<BR>";
 	  echo "   (**) Usa CTRL para seleccionar/desseleccionar.<BR>";
       echo "<input type='submit' value='Enviar' name='enviar'>";
