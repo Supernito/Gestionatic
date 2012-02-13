@@ -69,26 +69,7 @@
                    (nombre, descripcion, fecha, item)
                 VALUES ('$_POST[estado_item]','Se ha añadido el nuevo elemento', NOW(), $id)";
       $res = mysql_query($query) or die(mysql_error());
-	  
-	  
-	
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
+	  	  
       echo "Elemento de configuración creada con éxito.<BR>";
 
       if (isset($_POST['origen'])){

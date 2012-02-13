@@ -124,7 +124,7 @@
                    LEFT JOIN ".dbname.".estado_peticion ep ON (pc.id = ep.peticion_cambio)
                    WHERE ep.id=(SELECT max(id) FROM ".dbname.".estado_peticion
                                 WHERE peticion_cambio = pc.id group by peticion_cambio)
-                      AND ep.nombre != 'eliminado'";
+                      AND ep.nombre != 'eliminado' AND ep.nombre != 'finalizado'";
          $res = mysql_query($query) or die(mysql_error());
          $lin = mysql_fetch_array($res);
          if ($lin[tot] != 0){
