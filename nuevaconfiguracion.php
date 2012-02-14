@@ -139,12 +139,15 @@
 	  
       echo "   <tr><td>Padre </td><td> <select name='padre'>";
       $query = "SELECT id, descripcion from ".dbname.".item_id";
+				  
       $res   = mysql_query($query) or die(mysql_error());
 	  //Opcion sin padre	  
 		 echo "      <option value=0>Sin padre</option>";
 		 
       while ($row=mysql_fetch_array($res)){
-         echo "      <option value='".$row['id']."'>".$row['descripcion']."</option>";
+		if(($row['descripcion'] != 'eliminado')){
+			echo "      <option value='".$row['id']."'>".$row['descripcion']."</option>";
+		 }
       } 
 	  
 	  

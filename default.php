@@ -29,14 +29,14 @@
          echo "<a href='./gproblemas.php'>Gestión de Problemas</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_conf] == 'true'){
-         echo "<a href='./gconfiguracion.php'>Gestión de Configuraciones</a><BR>"; $opciones++;
+         echo "<a href='./gconfiguracion.php'>Gestión de Configuraciones y Versiones</a><BR>"; $opciones++;
       }
       if ($row[is_admin] == 'true' || $row[g_cambios] == 'true'){
          echo "<a href='./gcambios.php'>Gestión de Cambios</a><BR>"; $opciones++;
       }
-      if ($row[is_admin] == 'true' || $row[g_ver] == 'true'){
+      /*if ($row[is_admin] == 'true' || $row[g_ver] == 'true'){
          echo "<a href='./'>Gestión de Versiones</a>(pendiente)<BR>"; $opciones++;
-      }
+      }*/
       if ($row[is_admin] == 'true' || $row[g_usuarios] == 'true'){
          echo "<a href='./gusuarios.php'>Gestión de Usuarios</a><BR>"; $opciones++;
       }

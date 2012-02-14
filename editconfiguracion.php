@@ -147,6 +147,20 @@
          $res = mysql_query($query) or die(mysql_error());
 	  }
   
+        // Descripción
+      $dpadre = $_POST[padre];
+
+      if ($old[padre] != $dpadre){
+         $query = "UPDATE ".dbname.".item_id SET padre = '$dpadre' WHERE id = $_POST[id_con]";
+         $res = mysql_query($query) or die(mysql_error());
+         $query = "INSERT INTO ".dbname.".estado_item
+                         (nombre, descripcion, fecha, item)
+                   VALUES ('$_POST[estado_item]','Se ha asignado un nuevo padre.',
+                            NOW(), $_POST[id_con])";
+         $res = mysql_query($query) or die(mysql_error());
+      }
+  
+
 	  
 	  echo "Elemento de configuración actualizado.<BR>";
       echo "<button type='button' onClick=\"location.href='gconfiguracion.php'\">Volver</button>";
@@ -267,8 +281,24 @@
 	  }
 	  
 
+	        echo "   <tr><td>Padre </td><td> <select name='padre'>";
+      $query = "SELECT id, descripcion from ".dbname.".item_id";
+				  
+      $res   = mysql_query($query) or die(mysql_error());
+	  //Opcion sin padre	  
+		 echo "      <option value=0>Sin padre</option>";
+		 
+      while ($row=mysql_fetch_array($res)){
+		if(($row['descripcion'] != 'eliminado')){
+			echo "      <option value='".$row['id']."'>".$row['descripcion']."</option>";
+		 }
+      } 
 	  
-	  echo "</table>";
+	  
+	    echo "   </select> </td></tr>";
+      echo "   </select> </td></tr></table>";
+	 
+	  //echo "</table>";
 	  
 	  echo "<H4></H4>";
       echo "(*) Campo obliglatorio.<BR>";
